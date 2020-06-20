@@ -1,6 +1,7 @@
 'use strict'
 const path = require('path')
 const defaultSettings = require('./src/settings.js')
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin')
 
 function resolve(dir) {
   return path.join(__dirname, dir)
@@ -121,5 +122,11 @@ module.exports = {
           config.optimization.runtimeChunk('single')
         }
       )
+    config.plugin('monaco-editor').use(MonacoWebpackPlugin, [
+      {
+        // Languages are loaded on demand at runtime
+        languages: ['json', 'javascript', 'html', 'xml']
+      }
+    ])
   }
 }

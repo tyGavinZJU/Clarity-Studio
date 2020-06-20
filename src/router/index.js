@@ -48,9 +48,8 @@ export const constantRoutes = [
     hidden: true
   },
   {
-    path: '/',
+    path: '/dashboard',
     component: Layout,
-    redirect: '/dashboard',
     children: [{
       path: 'dashboard',
       name: 'Dashboard',
@@ -58,11 +57,10 @@ export const constantRoutes = [
       meta: { title: 'Dashboard', icon: 'dashboard' }
     }]
   },
-  // {
-  //   path: '/',
-  //   redirect: '/ide'
-  // },
-
+  {
+    path: '/',
+    redirect: '/ide'
+  },
   {
     path: '/example',
     component: Layout,
