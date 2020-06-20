@@ -42,7 +42,11 @@ export const constantRoutes = [
     component: () => import('@/views/404'),
     hidden: true
   },
-
+  {
+    path: '/ide',
+    component: () => import('@/ide/index'),
+    hidden: true
+  },
   {
     path: '/',
     component: Layout,
@@ -54,6 +58,10 @@ export const constantRoutes = [
       meta: { title: 'Dashboard', icon: 'dashboard' }
     }]
   },
+  // {
+  //   path: '/',
+  //   redirect: '/ide'
+  // },
 
   {
     path: '/example',

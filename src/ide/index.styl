@@ -1,0 +1,61 @@
+.main-wrapper{
+  height 100%;
+  width 100%;
+  position relative
+}
+.footer-status{
+  background-color #1A79D3
+  color #fff
+  display flex
+  align-items center
+  font-size 12px
+}
+.left-side{
+  color #ffffff
+}
+.header{
+  height 30px
+  background-color #F3F3F3
+}
+
+.left-content{
+  display flex
+  flex-direction row
+  height 100%
+  .panel-nav{
+    width 50px
+    display flex
+    flex-direction column
+    justify-content flex-start
+    align-items center
+    height 100%
+    .item{
+      margin-top 20px
+      font-size 25px
+    }
+
+  }
+  .panel-content{
+    background-color #F2F2F2
+    height 100%
+    flex 1
+    border-right 1px lightblue solid
+    .bar{
+      box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1)
+      height 30px
+      display flex
+      justify-content flex-start
+      align-items center
+      color #5a5e66
+      .item{
+        margin-left 10px
+        &.add{
+          color green
+        }
+      }
+      i{
+        font-size 20px
+      }
+    }
+  }
+}
