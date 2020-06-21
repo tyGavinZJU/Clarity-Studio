@@ -108,7 +108,18 @@ export default {
       }
     }
   },
+  created() {
+    window.addEventListener('resize', this.onWindowResize)
+  },
+  destroyed() {
+    window.removeEventListener('resize', this.onWindowResize)
+  },
   methods: {
+    onWindowResize() {
+      this.$nextTick(() => {
+        this.$refs.editor.editor.layout()
+      })
+    },
     handleNodeClick(data) {
       console.log(data)
     },
