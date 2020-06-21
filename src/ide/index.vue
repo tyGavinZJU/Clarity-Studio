@@ -1,7 +1,7 @@
 <template>
   <el-container class="main-wrapper">
     <el-container>
-      <el-aside class="left-side" width="250px" style="background-color: #2C2C2C">
+      <el-aside class="left-side" :width="leftPanel.show?'250px':'50px'" style="background-color: #2C2C2C">
         <div class="left-content">
           <div class="panel-nav">
             <div class="item">
@@ -12,20 +12,23 @@
             </div>
           </div>
 
-          <div class="panel-content" v-show="leftPanel.show">
-            <div class="bar">
-              <div class="item add">
-                File
-                <i class="el-icon-document-add" />
+          <transition name="fade">
+            <div v-if="leftPanel.show" class="panel-content">
+              <div class="bar">
+                <div class="item add">
+                  File
+                  <i class="el-icon-document-add" />
+                </div>
+              </div>
+              <div>
+                <el-tree :data="data" :props="defaultProps" @node-click="handleNodeClick" />
               </div>
             </div>
-            <div>
-              <el-tree :data="data" :props="defaultProps" @node-click="handleNodeClick" />
-            </div>
-          </div>
+          </transition>
+
         </div>
       </el-aside>
-      <el-container>
+      <el-container style="margin: 0;padding: 0;height: 100%;width: 100%;">
         <el-header class="header" style="height:30px">
           <div class="switch" @click="toggleLeftPanel">
             <i class="el-icon-s-fold" />
@@ -36,16 +39,19 @@
 
           </div>
         </el-header>
-        <el-main style="margin: 0;padding: 0;height: 100%;width: 100%;">
+        <el-main style="margin: 0;padding: 0;height:100%;width: 100%;">
           <MonacoEditor
+            ref="editor"
+            width="100%"
+            height="100%"
             theme="vs-dark"
             language="javascript"
             :options="options"
             @change="onChange"
           />
         </el-main>
-        <el-footer style="background-color:#aaa;height: 250px;" v-show="bottomPanel.show">
-          Footer
+        <el-footer class="bottom-panel" style="height: 200px;">
+          Info:
         </el-footer>
       </el-container>
     </el-container>
@@ -59,7 +65,7 @@
 </template>
 
 <script>
-import MonacoEditor from 'monaco-editor-vue'
+import MonacoEditor from '@/components/monaco-editor-vue/src/index'
 
 export default {
   components: {
@@ -69,7 +75,6 @@ export default {
     return {
       leftPanel: { show: true },
       bottomPanel: { show: true },
-
       data: [{
         label: '一级 1',
         children: [{
@@ -112,12 +117,15 @@ export default {
     },
     toggleLeftPanel() {
       this.leftPanel.show = !this.leftPanel.show
-      this.$forceUpdate()
-      this.$refs
+      this.$nextTick(() => {
+        this.$refs.editor.editor.layout()
+      })
     },
     toggleBottomPanel() {
       this.bottomPanel.show = !this.bottomPanel.show
-      this.$forceUpdate()
+      this.$nextTick(() => {
+        this.$refs.editor.editor.layout()
+      })
     }
   }
 }
