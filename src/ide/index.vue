@@ -65,7 +65,7 @@
 </template>
 
 <script>
-import MonacoEditor from '@/components/monaco-editor-vue/src/index'
+import MonacoEditor from '@/ide/MonacoEditor'
 
 export default {
   components: {
@@ -104,7 +104,9 @@ export default {
         minimap: {
           // 不要小地图
           enabled: true
-        }
+        },
+        rulers: [80, 160],
+        tabSize: 2
       }
     }
   },
