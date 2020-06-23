@@ -25,7 +25,14 @@
                 </div>
               </div>
               <div>
-                <div v-for="item in files" :id="item.id" :key="item.id" class="file-item" :class="{active:item.active}">
+                <div
+                  v-for="item in files"
+                  :id="item.id"
+                  :key="item.id"
+                  class="file-item"
+                  :class="{active:item.active}"
+                  @click="openFile(item)"
+                >
                   {{ item.name }}
                 </div>
               </div>
@@ -33,7 +40,7 @@
           </transition>
         </div>
       </el-aside>
-      <el-container style="margin: 0;padding: 0;height: 100%;width: 100%;">
+      <el-container class="main" style="margin: 0;padding: 0;width: 100%;">
         <el-header class="header" style="height:30px">
           <div class="switch" @click="toggleLeftPanel">
             <i class="el-icon-s-fold" />
@@ -45,15 +52,16 @@
         </el-header>
         <el-button-group style="height: 28px;width:100%;">
           <el-button
-            v-for="item in files"
+            v-for="item in openedFiles"
             :id="item.id"
             :key="item.id"
             :class="{active:item.active}"
             size="mini"
             plain
             :type="item.active?'primary':''"
+            @click="closeFile(item)"
           >
-            超小按钮<i class="el-icon-close el-icon--right" /></el-button>
+            {{ item.name }}<i class="el-icon-close el-icon--right" /></el-button>
         </el-button-group>
         <el-main style="margin: 0;padding: 0;height:100%;width: 100%;">
           <MonacoEditor
@@ -82,7 +90,8 @@
 
 <script>
 import MonacoEditor from '@/ide/MonacoEditor'
-import { mapState } from 'vuex'
+import _ from 'lodash'
+import { mapState, mapActions } from 'vuex'
 
 export default {
   components: {
@@ -98,7 +107,11 @@ export default {
     ...mapState({
       files: state => state.ide.files,
       editorOptions: state => state.ide.editorOptions,
-      openedFiles: state => state.ide.openedFiles
+      openedFiles: state => {
+        return _.filter(state.ide.files, (f) => {
+          return f.opened === true
+        })
+      }
     })
   },
   created() {
@@ -108,6 +121,7 @@ export default {
     window.removeEventListener('resize', this.onWindowResize)
   },
   methods: {
+    ...mapActions('ide', ['openFile', 'closeFile']),
     onWindowResize() {
       this.$nextTick(() => {
         this.$refs.editor.editor.layout()
@@ -130,31 +144,6 @@ export default {
       this.$nextTick(() => {
         this.$refs.editor.editor.layout()
       })
-    },
-    openFile(targetName) {
-      const newTabName = ++this.tabIndex + ''
-      this.editableTabs.push({
-        title: 'New Tab',
-        name: newTabName,
-        content: 'New Tab content'
-      })
-      this.editableTabsValue = newTabName
-    },
-    closeFile(targetName) {
-      const tabs = this.editableTabs
-      let activeName = this.editableTabsValue
-      if (activeName === targetName) {
-        tabs.forEach((tab, index) => {
-          if (tab.name === targetName) {
-            const nextTab = tabs[index + 1] || tabs[index - 1]
-            if (nextTab) {
-              activeName = nextTab.name
-            }
-          }
-        })
-      }
-      this.editableTabsValue = activeName
-      this.editableTabs = tabs.filter(tab => tab.name !== targetName)
     }
   }
 }
