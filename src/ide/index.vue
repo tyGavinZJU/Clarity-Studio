@@ -1,7 +1,11 @@
 <template>
   <el-container class="main-wrapper">
     <el-container>
-      <el-aside class="left-side" :width="leftPanel.show?'250px':'50px'" style="background-color: #2C2C2C">
+      <el-aside
+        class="left-side"
+        :width="leftPanel.show ? '250px' : '50px'"
+        style="background-color: #2C2C2C"
+      >
         <div class="left-content">
           <div class="panel-nav">
             <div class="item">
@@ -13,19 +17,20 @@
           </div>
 
           <transition name="fade">
-            <div v-if="leftPanel.show" class="panel-content">
+            <div v-if="leftPanel.show" class="panel-content" style="background-color: rgb(33,37,43);color:#fff;">
               <div class="bar">
-                <div class="item add">
+                <div class="item add" style="color:#fff;">
                   File
                   <i class="el-icon-document-add" />
                 </div>
               </div>
               <div>
-                <el-tree :data="data" :props="defaultProps" @node-click="handleNodeClick" />
+                <div v-for="item in files" :id="item.id" :key="item.id" class="file-item" :class="{active:item.active}">
+                  {{ item.name }}
+                </div>
               </div>
             </div>
           </transition>
-
         </div>
       </el-aside>
       <el-container style="margin: 0;padding: 0;height: 100%;width: 100%;">
@@ -36,9 +41,20 @@
           <div class="actions" style="float: right;">
             <el-button size="mini" type="text">Compile</el-button>
             <el-button size="mini" type="text">Deploy</el-button>
-
           </div>
         </el-header>
+        <el-button-group style="height: 28px;width:100%;">
+          <el-button
+            v-for="item in files"
+            :id="item.id"
+            :key="item.id"
+            :class="{active:item.active}"
+            size="mini"
+            plain
+            :type="item.active?'primary':''"
+          >
+            超小按钮<i class="el-icon-close el-icon--right" /></el-button>
+        </el-button-group>
         <el-main style="margin: 0;padding: 0;height:100%;width: 100%;">
           <MonacoEditor
             ref="editor"
@@ -46,12 +62,13 @@
             height="100%"
             theme="vs-dark"
             language="javascript"
-            :options="options"
+            :options="editorOptions"
             @change="onChange"
           />
         </el-main>
         <el-footer class="bottom-panel" style="height: 200px;">
           Info:
+          {{ files }}
         </el-footer>
       </el-container>
     </el-container>
@@ -61,11 +78,11 @@
       </div>
     </el-footer>
   </el-container>
-
 </template>
 
 <script>
 import MonacoEditor from '@/ide/MonacoEditor'
+import { mapState } from 'vuex'
 
 export default {
   components: {
@@ -74,41 +91,15 @@ export default {
   data() {
     return {
       leftPanel: { show: true },
-      bottomPanel: { show: true },
-      data: [{
-        label: '一级 1',
-        children: [{
-          label: 'file1'
-        }]
-      }, {
-        label: '一级 2',
-        children: [{
-          label: '二级 2-1'
-        }, {
-          label: 'file2'
-        }]
-      }, {
-        label: '一级 3',
-        children: [{
-          label: '二级 3-1'
-        }, {
-          label: '二级 3-2'
-        }]
-      }],
-      defaultProps: {
-        children: 'children',
-        label: 'label'
-      },
-      options: {
-        // Monaco Editor Options
-        minimap: {
-          // 不要小地图
-          enabled: true
-        },
-        rulers: [80, 160],
-        tabSize: 2
-      }
+      bottomPanel: { show: true }
     }
+  },
+  computed: {
+    ...mapState({
+      files: state => state.ide.files,
+      editorOptions: state => state.ide.editorOptions,
+      openedFiles: state => state.ide.openedFiles
+    })
   },
   created() {
     window.addEventListener('resize', this.onWindowResize)
@@ -139,11 +130,43 @@ export default {
       this.$nextTick(() => {
         this.$refs.editor.editor.layout()
       })
+    },
+    openFile(targetName) {
+      const newTabName = ++this.tabIndex + ''
+      this.editableTabs.push({
+        title: 'New Tab',
+        name: newTabName,
+        content: 'New Tab content'
+      })
+      this.editableTabsValue = newTabName
+    },
+    closeFile(targetName) {
+      const tabs = this.editableTabs
+      let activeName = this.editableTabsValue
+      if (activeName === targetName) {
+        tabs.forEach((tab, index) => {
+          if (tab.name === targetName) {
+            const nextTab = tabs[index + 1] || tabs[index - 1]
+            if (nextTab) {
+              activeName = nextTab.name
+            }
+          }
+        })
+      }
+      this.editableTabsValue = activeName
+      this.editableTabs = tabs.filter(tab => tab.name !== targetName)
     }
   }
 }
 </script>
 
 <style lang="stylus" scoped>
-  @import './index.styl'
+@import './index.styl'
+.file-item{
+  padding 5px 0 5px 10px
+  &.active{
+    background-color #99a9bf
+  }
+}
+
 </style>
