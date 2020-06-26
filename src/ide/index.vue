@@ -60,9 +60,11 @@
             size="mini"
             plain
             :type="item.active?'primary':''"
-            @click="closeFile(item)"
+
           >
-            {{ item.name }}<i class="el-icon-close el-icon--right" /></el-button>
+            {{ item.name }}
+            <i @click="closeFile(item)" class="el-icon-close el-icon--right" />
+          </el-button>
         </el-button-group>
         <el-main style="margin: 0;padding: 0;height:100%;width: 100%;">
           <MonacoEditor
