@@ -1,5 +1,4 @@
 import _ from 'lodash'
-const ID = 1
 const state = {
   files: [
     { name: 'a.js', id: 1, active: false, opened: false },
@@ -69,6 +68,26 @@ const actions = {
   },
   closeFile({ dispatch, commit, state }, item) {
     commit('CLOSE_FILE', item)
+  },
+  // 1.文件名仅允许字符/数字/下划线
+  // 2.不可与已有的文件重复
+  // TODO 支持文件夹？
+  addFile({ dispatch, commit, state }, fileName) {
+    // 增加文件
+    state.files.push({ name: fileName, id: fileName, active: false, opened: false })
+
+    // todo localstorage
+  },
+
+  removeFile({ dispatch, commit, state }, name) {
+    const index = _.findIndex(state.files, (o) => {
+      return o.name === name
+    })
+    if (index !== -1) {
+      state.files.splice(index, 1)
+
+      // todo localstorage
+    }
   }
 }
 export default {

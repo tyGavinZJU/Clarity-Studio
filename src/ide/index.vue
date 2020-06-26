@@ -21,7 +21,7 @@
               <div class="bar">
                 <div class="item add" style="color:#fff;">
                   File
-                  <i class="el-icon-document-add" />
+                  <i class="el-icon-document-add" @click="createFileFormShow=true" />
                 </div>
               </div>
               <div>
@@ -34,6 +34,7 @@
                   @click="openFile(item)"
                 >
                   {{ item.name }}
+                  <i style="float: right;" class="delete el-icon-delete" @click="onRemoveFile(item)" />
                 </div>
               </div>
             </div>
@@ -85,6 +86,17 @@
         <i class="el-icon-s-fold" style="transform: rotate(90deg);" />
       </div>
     </el-footer>
+    <el-dialog title="添加文件" :visible.sync="createFileFormShow">
+      <el-form :model="createFileForm">
+        <el-form-item label="文件名" :label-width="formLabelWidth">
+          <el-input v-model="createFileForm.name" autocomplete="off" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="createFileFormShow = false">取 消</el-button>
+        <el-button type="primary" @click="onAddFile(createFileForm)">确 定</el-button>
+      </div>
+    </el-dialog>
   </el-container>
 </template>
 
@@ -100,7 +112,12 @@ export default {
   data() {
     return {
       leftPanel: { show: true },
-      bottomPanel: { show: true }
+      bottomPanel: { show: true },
+      createFileForm: {
+
+      },
+      formLabelWidth: '120px',
+      createFileFormShow: false
     }
   },
   computed: {
@@ -121,7 +138,7 @@ export default {
     window.removeEventListener('resize', this.onWindowResize)
   },
   methods: {
-    ...mapActions('ide', ['openFile', 'closeFile']),
+    ...mapActions('ide', ['openFile', 'closeFile', 'addFile', 'removeFile']),
     onWindowResize() {
       this.$nextTick(() => {
         this.$refs.editor.editor.layout()
@@ -144,6 +161,23 @@ export default {
       this.$nextTick(() => {
         this.$refs.editor.editor.layout()
       })
+    },
+    onAddFile(data) {
+      const fileName = data.name
+      const name = fileName.replace(/[/\\?%*:|"<>]/g, '-')
+      const found = _.find(this.files, (o) => {
+        return o.name === name
+      })
+      if (found) {
+        this.$message.error('文件名重复或者包含非法字符')
+        return
+      }
+      this.addFile(name)
+      this.createFileFormShow = false
+    },
+    onRemoveFile(item) {
+      const fileName = item.name
+      this.removeFile(fileName)
     }
   }
 }
@@ -155,6 +189,13 @@ export default {
   padding 5px 0 5px 10px
   &.active{
     background-color #99a9bf
+  }
+  .delete{
+    display none;
+  }
+  &:hover .delete{
+    display block;
+    margin-right 10px;
   }
 }
 
