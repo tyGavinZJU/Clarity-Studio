@@ -1,5 +1,7 @@
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
 import 'monaco-editor/esm/vs/basic-languages/javascript/javascript.contribution'
+import '@/ide/languages/clarity/clarity.contribution'
+
 import 'monaco-editor/esm/vs/editor/contrib/bracketMatching/bracketMatching.js'
 import 'monaco-editor/esm/vs/editor/contrib/folding/folding.js'
 
@@ -15,7 +17,7 @@ export default {
     height: { type: [String, Number], default: '100%' },
     original: String, // 只有在diff模式下有效
     value: String,
-    language: { type: String, default: 'javascript' },
+    language: { type: String, default: 'clarity' },
     theme: { type: String, default: 'vs' },
     options: { type: Object, default() { return {} } },
     editorMounted: { type: Function, default: noop },
