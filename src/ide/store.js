@@ -2,7 +2,8 @@ import _ from 'lodash'
 import db from './db'
 const DEFAULT_STATE = {
   files: [],
-  fileContentMap: {},
+  filesContent: {},
+  curFileId: '',
   editorOptions: {
     minimap: {
       // 小地图
@@ -16,13 +17,11 @@ const DEFAULT_STATE = {
   }
 }
 const state = {
-  files: [
-    // { name: 'a.js', id: 1, active: false, opened: false },
-    // { name: 'b.js', id: 2, active: true, opened: false }
-  ],
-  fileContentMap: {
-    // name: '',
-  },
+  // { name: 'a.js', id: 1, active: false, opened: false },
+  files: [],
+  // {"fileName":  'value'}
+  filesContent: {},
+  curFileId: '',
   editorOptions: {
     minimap: {
       // 小地图
@@ -50,6 +49,8 @@ const mutations = {
       o.active = false
     })
     found.active = true
+    state.curFileId = found.name
+    console.log('OPEN_FILE', found, state.curFileId)
   },
   CLOSE_FILE(state, item) {
     const found = _.find(state.files, (o) => {
@@ -64,7 +65,9 @@ const mutations = {
     })
     if (newActive) {
       newActive.active = true
+      state.curFileId = newActive.name
     }
+    console.log('CLOSE_FILE then OPEN_FILE', newActive)
   }
 }
 
@@ -77,7 +80,15 @@ const mutations = {
 const actions = {
   initIDE({ dispatch, commit, state }) {
     const files = db.get('files') || DEFAULT_STATE.files
+    const filesContent = db.get('filesContent') || DEFAULT_STATE.filesContent
+
     state.files = files
+    state.filesContent = filesContent
+
+    const active = _.find(state.files, (o) => {
+      return o.active === true
+    })
+    state.curFileId = active.name
   },
   openFile({ dispatch, commit, state }, item) {
     commit('OPEN_FILE', item)
@@ -108,6 +119,13 @@ const actions = {
       // localstorage
       db.set('files', state.files)
     }
+  },
+  updateEditorValue({ dispatch, commit, state }, value) {
+    console.log('updateEditorValue', state.curFileId, value)
+    const fileId = state.curFileId
+    state.filesContent[fileId] = value
+
+    db.set('filesContent', state.filesContent)
   }
 }
 export default {

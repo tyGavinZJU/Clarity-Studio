@@ -63,7 +63,7 @@
             @click="openFile(item)"
           >
             {{ item.name }}
-            <i @click="closeFile(item)" class="el-icon-close el-icon--right" />
+            <i class="el-icon-close el-icon--right" @click="closeFile(item)" />
           </el-button>
         </el-button-group>
         <el-main style="margin: 0;padding: 0;height:100%;width: 100%;">
@@ -74,12 +74,13 @@
             theme="vs-dark"
             language="javascript"
             :options="editorOptions"
+            :value="filesContent[curFileId]||''"
             @change="onChange"
           />
         </el-main>
         <el-footer class="bottom-panel" style="height: 200px;">
           Info:
-          {{ files }}
+          {{curFileId}}
         </el-footer>
       </el-container>
     </el-container>
@@ -125,6 +126,8 @@ export default {
   computed: {
     ...mapState({
       files: state => state.ide.files,
+      filesContent: state => state.ide.filesContent,
+      curFileId: state => state.ide.curFileId,
       editorOptions: state => state.ide.editorOptions,
       openedFiles: state => {
         return _.filter(state.ide.files, (f) => {
@@ -133,15 +136,26 @@ export default {
       }
     })
   },
+  watch: {
+    curFileId: function(val) {
+      console.log('watch curFileId', val)
+    }
+  },
   created() {
     window.addEventListener('resize', this.onWindowResize)
     this.initIDE()
+    console.log('created curFileId', this.curFileId)
+  },
+  mounted() {
+    this.$nextTick(() => {
+      console.log('mounted curFileId', this.curFileId)
+    })
   },
   destroyed() {
     window.removeEventListener('resize', this.onWindowResize)
   },
   methods: {
-    ...mapActions('ide', ['initIDE', 'openFile', 'closeFile', 'addFile', 'removeFile']),
+    ...mapActions('ide', ['initIDE', 'openFile', 'closeFile', 'addFile', 'removeFile', 'updateEditorValue']),
     onWindowResize() {
       this.$nextTick(() => {
         this.$refs.editor.editor.layout()
@@ -151,7 +165,8 @@ export default {
       console.log(data)
     },
     onChange(value) {
-      console.log(value)
+      console.log('onChange', value)
+      this.updateEditorValue(value)
     },
     toggleLeftPanel() {
       this.leftPanel.show = !this.leftPanel.show
@@ -167,7 +182,7 @@ export default {
     },
     onAddFile(data) {
       const fileName = data.name
-      const name = fileName.replace(/[/\\?%*:|"<>]/g, '-')
+      const name = fileName.replace(/[/\\?%*:|"<> ]/g, '-')
       const found = _.find(this.files, (o) => {
         return o.name === name
       })
