@@ -1,34 +1,26 @@
-const SESSION_KEY = 'ide_'
-
-// TODO using promise
+const PREFIX_KEY = 'IDE_'
 export default {
-  get: function() {
-    const content = window.localStorage.getItem(SESSION_KEY)
-    if (!content) return {}
+  get: function(name) {
+    const innerName = `${PREFIX_KEY}${name}`
+    const content = window.localStorage.getItem(innerName)
+    if (!content) return null
     try {
       return JSON.parse(content)
     } catch (e) {
-      window.localStorage.removeItem(SESSION_KEY)
-      console.error('session.get error', content)
-      return {}
+      window.localStorage.removeItem(innerName)
+      return null
     }
   },
-  set: function(data) {
-    const curData = this.get()
-
-    // TODO 检测，确保不可为数组
-    if (typeof data === 'object') {
-      const newData = { ...curData, ...data }
-      try {
-        window.localStorage.setItem(SESSION_KEY, JSON.stringify(newData))
-      } catch (e) {
-        console.error('session.set error', data)
-      }
-    } else {
-      console.error('session.set only support object', data)
+  set: function(name, data) {
+    const innerName = `${PREFIX_KEY}${name}`
+    try {
+      window.localStorage.setItem(innerName, JSON.stringify(data))
+    } catch (e) {
+      console.error('Data can not be stringified', data)
     }
   },
   clear: function() {
-    window.localStorage.removeItem(SESSION_KEY)
+    const innerName = `${PREFIX_KEY}${name}`
+    window.localStorage.removeItem(innerName)
   }
 }

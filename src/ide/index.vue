@@ -60,7 +60,7 @@
             size="mini"
             plain
             :type="item.active?'primary':''"
-
+            @click="openFile(item)"
           >
             {{ item.name }}
             <i @click="closeFile(item)" class="el-icon-close el-icon--right" />
@@ -135,12 +135,13 @@ export default {
   },
   created() {
     window.addEventListener('resize', this.onWindowResize)
+    this.initIDE()
   },
   destroyed() {
     window.removeEventListener('resize', this.onWindowResize)
   },
   methods: {
-    ...mapActions('ide', ['openFile', 'closeFile', 'addFile', 'removeFile']),
+    ...mapActions('ide', ['initIDE', 'openFile', 'closeFile', 'addFile', 'removeFile']),
     onWindowResize() {
       this.$nextTick(() => {
         this.$refs.editor.editor.layout()

@@ -1,25 +1,37 @@
 import _ from 'lodash'
-const state = {
-  files: [
-    { name: 'a.js', id: 1, active: false, opened: false },
-    { name: 'b.js', id: 2, active: true, opened: false }
-  ],
-  fileContentMap: {
-    fileId: '',
-    fileId2: ''
-  },
-  // openedFiles: [
-  //   { name: 'b.js', id: 2, active: true }
-  // ],
+import db from './db'
+const DEFAULT_STATE = {
+  files: [],
+  fileContentMap: {},
   editorOptions: {
     minimap: {
-      // 不要小地图
+      // 小地图
       enabled: true
     },
     rulers: [80, 160],
     tabSize: 2
   },
-  // 预设不同模式
+  theme: {
+
+  }
+}
+const state = {
+  files: [
+    // { name: 'a.js', id: 1, active: false, opened: false },
+    // { name: 'b.js', id: 2, active: true, opened: false }
+  ],
+  fileContentMap: {
+    // name: '',
+  },
+  editorOptions: {
+    minimap: {
+      // 小地图
+      enabled: true
+    },
+    rulers: [80, 160],
+    tabSize: 2
+  },
+  // 预设不同风格
   theme: {
     one: {},
     two: {
@@ -63,11 +75,17 @@ const mutations = {
 //  关闭文件
 
 const actions = {
+  initIDE({ dispatch, commit, state }) {
+    const files = db.get('files') || DEFAULT_STATE.files
+    state.files = files
+  },
   openFile({ dispatch, commit, state }, item) {
     commit('OPEN_FILE', item)
+    db.set('files', state.files)
   },
   closeFile({ dispatch, commit, state }, item) {
     commit('CLOSE_FILE', item)
+    db.set('files', state.files)
   },
   // 1.文件名仅允许字符/数字/下划线
   // 2.不可与已有的文件重复
@@ -76,7 +94,8 @@ const actions = {
     // 增加文件
     state.files.push({ name: fileName, id: fileName, active: false, opened: false })
 
-    // todo localstorage
+    // localstorage
+    db.set('files', state.files)
   },
 
   removeFile({ dispatch, commit, state }, name) {
@@ -86,7 +105,8 @@ const actions = {
     if (index !== -1) {
       state.files.splice(index, 1)
 
-      // todo localstorage
+      // localstorage
+      db.set('files', state.files)
     }
   }
 }
