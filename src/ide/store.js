@@ -126,6 +126,14 @@ const actions = {
     state.filesContent[fileId] = value
 
     db.set('filesContent', state.filesContent)
+  },
+
+  // 底部信息展示API TODO
+  clearConsole() { // 清空
+  },
+  setConsole() { // 设置，覆盖
+  },
+  appendConsole() { // 附加
   }
 }
 export default {
