@@ -14,7 +14,8 @@ const DEFAULT_STATE = {
   },
   theme: {
 
-  }
+  },
+  consoleLogs: []
 }
 const state = {
   // { name: 'a.js', id: 1, active: false, opened: false },
@@ -35,7 +36,8 @@ const state = {
     one: {},
     two: {
     }
-  }
+  },
+  consoleLogs: []
 }
 
 const mutations = {
@@ -118,6 +120,7 @@ const actions = {
 
       // localstorage
       db.set('files', state.files)
+      dispatch('log', `File removed ${name}`)
     }
   },
   updateEditorValue({ dispatch, commit, state }, value) {
@@ -128,12 +131,20 @@ const actions = {
     db.set('filesContent', state.filesContent)
   },
 
-  // 底部信息展示API TODO
-  clearConsole() { // 清空
+  // //////////////////
+  // 底部信息展示API
+  clearConsole({ dispatch, commit, state }) { // 清空
+    state.consoleLogs = []
   },
-  setConsole() { // 设置，覆盖
+  setConsole({ dispatch, commit, state }, msg) { // 设置，覆盖
+    if (_.isArray(msg)) state.consoleLogs = msg
+    else state.consoleLogs = [msg]
   },
-  appendConsole() { // 附加
+  appendConsole({ dispatch, commit, state }, msg) { // 附加
+    state.consoleLogs.push(msg)
+  },
+  log({ dispatch, commit, state }, msg) { // 同appendConsole
+    state.consoleLogs.push(msg)
   }
 }
 export default {

@@ -34,7 +34,7 @@
                   @click="openFile(item)"
                 >
                   {{ item.name }}
-                  <i style="float: right;" class="delete el-icon-delete" @click="onRemoveFile(item)" />
+                  <i style="float: right;" class="delete el-icon-delete" @click.stop="onRemoveFile(item)" />
                 </div>
               </div>
             </div>
@@ -79,8 +79,10 @@
           />
         </el-main>
         <el-footer class="bottom-panel" style="height: 200px;">
-          Info:
-          {{curFileId}}
+          Current File: {{ curFileId }}
+          <div v-for="(item,index) in consoleLogs" :key="index">
+            {{ index }} {{ item }}
+          </div>
         </el-footer>
       </el-container>
     </el-container>
@@ -89,15 +91,15 @@
         <i class="el-icon-s-fold" style="transform: rotate(90deg);" />
       </div>
     </el-footer>
-    <el-dialog title="添加文件" :visible.sync="createFileFormShow">
+    <el-dialog title="Create File" :visible.sync="createFileFormShow">
       <el-form :model="createFileForm">
-        <el-form-item label="文件名" :label-width="formLabelWidth">
+        <el-form-item label="File Name" :label-width="formLabelWidth">
           <el-input v-model="createFileForm.name" autocomplete="off" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="createFileFormShow = false">取 消</el-button>
-        <el-button type="primary" @click="onAddFile(createFileForm)">确 定</el-button>
+        <el-button @click="createFileFormShow = false">Cancel</el-button>
+        <el-button type="primary" @click="onAddFile(createFileForm)">Confirm</el-button>
       </div>
     </el-dialog>
   </el-container>
@@ -133,7 +135,8 @@ export default {
         return _.filter(state.ide.files, (f) => {
           return f.opened === true
         })
-      }
+      },
+      consoleLogs: state => state.ide.consoleLogs
     })
   },
   watch: {
@@ -155,7 +158,7 @@ export default {
     window.removeEventListener('resize', this.onWindowResize)
   },
   methods: {
-    ...mapActions('ide', ['initIDE', 'openFile', 'closeFile', 'addFile', 'removeFile', 'updateEditorValue']),
+    ...mapActions('ide', ['initIDE', 'openFile', 'closeFile', 'addFile', 'removeFile', 'updateEditorValue', 'log']),
     onWindowResize() {
       this.$nextTick(() => {
         this.$refs.editor.editor.layout()
@@ -187,7 +190,7 @@ export default {
         return o.name === name
       })
       if (found) {
-        this.$message.error('文件名重复或者包含非法字符')
+        this.$message.error('Please check the file name if it is illegal or duplicated')
         return
       }
       this.addFile(name)
