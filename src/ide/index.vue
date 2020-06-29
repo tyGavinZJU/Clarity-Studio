@@ -47,8 +47,8 @@
             <i class="el-icon-s-fold" />
           </div>
           <div class="actions" style="float: right;">
-            <el-button size="mini" type="text">Compile</el-button>
-            <el-button size="mini" type="text">Deploy</el-button>
+            <el-button size="mini" type="text" @click="onCompile">Compile</el-button>
+            <el-button size="mini" type="text" @click="onDeploy">Deploy</el-button>
           </div>
         </el-header>
         <el-button-group style="height: 28px;width:100%;">
@@ -109,7 +109,8 @@
 import MonacoEditor from '@/ide/MonacoEditor'
 import _ from 'lodash'
 import { mapState, mapActions } from 'vuex'
-
+import contractAPI from './contractAPI'
+import store from '@/store'
 export default {
   components: {
     MonacoEditor
@@ -137,7 +138,10 @@ export default {
         })
       },
       consoleLogs: state => state.ide.consoleLogs
-    })
+    }),
+    editorValue: (state, getters) => {
+      return state.filesContent[state.curFileId] || ''
+    }
   },
   watch: {
     curFileId: function(val) {
@@ -199,6 +203,19 @@ export default {
     onRemoveFile(item) {
       const fileName = item.name
       this.removeFile(fileName)
+    },
+
+    // 编译 运行
+    onCompile() {
+      console.log('onCompile')
+      contractAPI.compile(this.editorValue)
+    },
+
+    onDeploy() {
+      console.log('onDeploy', store.dispatch)
+      // contractAPI.deploy(this.editorValue)
+
+      store.dispatch('ide/clearConsole', 'hello')
     }
   }
 }
